@@ -1,0 +1,130 @@
+local plrs = game:GetService("Players")
+local rs = game:GetService("RunService")
+
+local lp = plrs.LocalPlayer
+local pg = lp:WaitForChild("PlayerGui")
+local cam = workspace.CurrentCamera
+
+local tpPos = CFrame.new(1000003.56, 999999.69, 8.17)
+
+local function doReset()
+	local c = lp.Character
+	if not c then return end
+
+	local h = c:FindFirstChild("HumanoidRootPart")
+	local hum = c:FindFirstChildOfClass("Humanoid")
+	if not h or not hum then return end
+
+	cam.CameraType = Enum.CameraType.Scriptable
+
+	task.delay(0.6, function()
+		local ch = lp.Character
+		local hm = ch and ch:FindFirstChildOfClass("Humanoid")
+		if hm then
+			cam.CameraType = Enum.CameraType.Custom
+			cam.CameraSubject = hm
+		end
+	end)
+
+	h.CFrame = tpPos
+
+	local con
+	con = rs.Heartbeat:Connect(function()
+		if not c or not c.Parent then
+			con:Disconnect()
+			return
+		end
+		if hum.Health <= 0 then
+			con:Disconnect()
+			return
+		end
+		h.CFrame = tpPos
+	end)
+end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "RadiantHub"
+gui.ResetOnSpawn = false
+gui.DisplayOrder = 999
+
+pcall(function()
+	gui.Parent = game:GetService("CoreGui")
+end)
+
+if not gui.Parent then
+	gui.Parent = pg
+end
+
+local f = Instance.new("Frame")
+f.Size = UDim2.new(0, 200, 0, 98)
+f.Position = UDim2.new(1, -215, 0, 10)
+f.BackgroundColor3 = Color3.fromRGB(1,50,32)
+f.BorderSizePixel = 0
+f.Parent = gui
+
+Instance.new("UICorner", f).CornerRadius = UDim.new(0,10)
+
+local st = Instance.new("UIStroke", f)
+st.Thickness = 2.5
+st.Color = Color3.fromRGB(0,255,85)
+
+local t = Instance.new("TextLabel")
+t.Size = UDim2.new(1,-20,0,26)
+t.Position = UDim2.new(0,10,0,6)
+t.BackgroundTransparency = 1
+t.Text = "Radiant Hub"
+t.Font = Enum.Font.GothamBold
+t.TextSize = 14
+t.TextColor3 = Color3.fromRGB(255,255,255)
+t.TextXAlignment = Enum.TextXAlignment.Left
+t.Parent = f
+
+local b = Instance.new("TextButton")
+b.Size = UDim2.new(1,-20,0,32)
+b.Position = UDim2.new(0,10,0,38)
+b.BackgroundColor3 = Color3.fromRGB(15,15,15)
+b.TextColor3 = Color3.fromRGB(255,255,255)
+b.Text = "Insta Reset"
+b.Font = Enum.Font.GothamBold
+b.TextSize = 12
+b.AutoButtonColor = false
+b.Parent = f
+
+Instance.new("UICorner", b).CornerRadius = UDim.new(0,6)
+
+local d = Instance.new("TextLabel")
+d.Size = UDim2.new(1,-20,0,14)
+d.Position = UDim2.new(0,10,0,76)
+d.BackgroundTransparency = 1
+d.Text = "discord.gg/3uKu2ahgy"
+d.Font = Enum.Font.Gotham
+d.TextSize = 9
+d.TextColor3 = Color3.fromRGB(255,255,255)
+d.TextXAlignment = Enum.TextXAlignment.Center
+d.Parent = f
+
+b.Activated:Connect(doReset)
+
+local drag, start, origin
+
+f.InputBegan:Connect(function(i)
+	if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+		drag = true
+		start = i.Position
+		origin = f.Position
+	end
+end)
+
+f.InputChanged:Connect(function(i)
+	if not drag then return end
+	if i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch then
+		local delta = i.Position - start
+		f.Position = UDim2.new(origin.X.Scale, origin.X.Offset + delta.X, origin.Y.Scale, origin.Y.Offset + delta.Y)
+	end
+end)
+
+f.InputEnded:Connect(function(i)
+	if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+		drag = false
+	end
+end)
